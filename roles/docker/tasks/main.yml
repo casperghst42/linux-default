@@ -1,0 +1,46 @@
+
+  - name: Instal packages
+    apt: pkg={{item}} state=present install_recommends=false
+    with_items:
+    - bridge-utils
+
+  - name: get docker
+    get_url: 
+      url: https://get.docker.com 
+      dest: /tmp/get-docker.sh 
+      mode: 755
+
+  - name: install docker
+    shell:
+      cmd: |
+        apt update
+        sh /tmp/get-docker.sh
+
+  - name: install composer plugin
+    apt:
+      name: docker-compose-plugin
+      state: present
+    
+  - name: update docker.json
+    copy:
+      content: '{ "ipv6":true, "fixed-cidr-v6":"{{ ipv6net }}"  }'
+      dest: /etc/docker/daemon.json
+
+  - name: install docker-compose (legacy)
+    get_url: 
+      url: https://raw.githubusercontent.com/linuxserver/docker-docker-compose/master/run.sh
+      dest: /usr/local/bin/docker-compose
+      mode: 755
+
+  - name: restart docker
+    systemd:
+      name: docker.service
+      state: reloaded      
+      enabled: yes
+      masked: no
+
+  - name: adding existing user '{{ lookup('env','USER') }}' to group docker
+    user:
+      name: "{{ lookup('env','USER') }}"
+      groups: docker
+      append: yes

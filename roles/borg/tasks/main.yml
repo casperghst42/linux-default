@@ -1,0 +1,13 @@
+# code=ansible
+
+  - name: install borg
+    get_url:
+      url: "{{ borgurl }}"
+      dest: /usr/local/bin/borg-linux64
+      mode: 755
+
+  - name: create symlink
+    file:
+      src: /usr/local/bin/borg-linux64
+      dest: /usr/local/bin/borg
+      state: link

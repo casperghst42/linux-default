@@ -1,0 +1,15 @@
+[master]
+master ansible_host=192.168.1.150
+
+[workers]
+worker1 ansible_host=192.168.1.151
+worker2 ansible_host=192.168.1.152
+worker3 ansible_host=192.168.1.153
+
+[all:vars]
+ansible_connection=ssh
+ansible_user=ansible
+
+[all:children]
+master
+workers

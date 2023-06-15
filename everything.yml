@@ -1,0 +1,20 @@
+# code=ansible
+
+- hosts: all
+  become: yes
+
+  pre_tasks:
+  - name: update APT cache
+    apt: update_cache=yes cache_valid_time=28800
+    when: ansible_os_family == 'Debian'
+
+  vars:
+    borgurl: https://github.com/borgbackup/borg/releases/download/1.2.2/borg-linux64
+    ipv6net: "2a06:4004:90f2:3456::/80"
+
+  roles:
+    - basics
+    - mdadm
+    - docker
+    - kvm
+    - borg

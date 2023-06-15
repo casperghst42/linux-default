@@ -1,0 +1,45 @@
+  # code=ansible
+
+  - name: Instal packages
+    apt: pkg={{item}} state=present install_recommends=false
+    with_items:
+    - libvirt-daemon-system
+    - qemu-kvm
+    - bridge-utils
+    - libvirt-clients
+    - virt-manager
+
+  - name: adding existing user '{{ lookup('env','USER') }}' to group libvirt
+    user:
+      name: "{{ lookup('env','USER') }}"
+      groups: libvirt
+      append: yes
+
+  - name: adding existing user '{{ lookup('env','USER') }}' to group libvirt-qemu
+    user:
+      name: "{{ lookup('env','USER') }}"
+      groups: libvirt-qemu
+      append: yes
+
+  - name: sysctl netfilter
+    shell:
+      cmd: | 
+        cat << EOF | tee /etc/sysctl.d/99-netfilter-bridge.conf
+        net.bridge.bridge-nf-call-ip6tables = 0
+        net.bridge.bridge-nf-call-iptables = 0
+        net.bridge.bridge-nf-call-arptables = 0
+        EOF
+
+  - name: modules netfilter
+    shell:
+      cmd: |
+        cat << EOF | tee /etc/modules-load.d/br_netfilter.conf
+        br_netfilter
+        EOF
+
+  - name: aliases
+    shell:
+      cmd: |
+        cat << EOF | tee /etc/profile.d/virsh
+        alias virsh='sudo virsh'
+        EOF
