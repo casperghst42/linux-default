@@ -1,5 +1,6 @@
 - hosts: all
   become: yes
+  remote_user: ansible
 
   pre_tasks:
   - name: update APT cache
@@ -7,7 +8,7 @@
     when: ansible_os_family == 'Debian'
 
   vars:
-    ipv6net: "2a06:4004:90f2:3456::/80"
+    ipv6net: "2a06:4004:90f2:4567::/80"
 
   roles:
     - docker
