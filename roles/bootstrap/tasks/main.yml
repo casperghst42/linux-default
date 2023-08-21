@@ -1,0 +1,106 @@
+  - name: install
+    apt:
+      state: present
+      pkg:
+        - sudo
+        - bash-completion
+        - vim
+        - nano
+        - python3 
+        - python3-pip 
+        - python3-setuptools 
+        - python3-wheel 
+        - python3-pip 
+        - openssl 
+        - libacl1 
+        - build-essential 
+        - fuse 
+        - locales 
+        - curl
+        - systemd-timesyncd
+
+
+  - name: default-editor
+    command: 
+      cmd: update-alternatives --set editor /usr/bin/vim.basic
+
+  - name: disable mouse in vim
+    command:
+      cmd: |
+        echo "set mouse-=a" >> /etc/vim/vimrc
+        echo "set ttymouse-=a" >> /etc/vimrc.tiny
+
+  - name: be-root
+    shell:
+      cmd: |
+        cat <<EOF | tee /usr/local/bin/be-root
+        #!/usr/bin/env bash
+        sudo su - ${*}
+        EOF
+
+        chown root:root /usr/local/bin/be-root
+        chmod +x /usr/local/bin/be-root
+
+  - name: environment
+    shell:
+      cmd: |
+        cat << EOF | tee -a /etc/environment
+        LANG=en_US.utf-8
+        LC_ALL=en_US.utf-8
+        EOF
+
+  - name: locale.gen
+    shell:
+      cmd: |
+        cat << EOF | tee -a /etc/locale.gen
+        en_US.UTF-8 UTF-8
+        EOF
+
+  - name: generate locale
+    shell:
+      cmd: locale-gen
+
+  - name: services systemd-timesyncd
+    systemd:
+      name: systemd-timesyncd.service
+      state: started   
+      enabled: yes
+      masked: no
+
+  - name: set tiemzone (europe/copenhagen)
+    shell:
+      cmd: timedatectl set-timezone Europe/Copenhagen
+
+  - name: add local timeserver
+    shell:
+      cmd: echo "NTP=192.168.1.1" >> /etc/systemd/timesyncd.conf
+
+  - name: restart systemd-timesyncd.service
+    systemd:
+      name: systemd-timesyncd.service
+      state: restarted  
+
+  - name: enable NTP
+    shell:
+      cmd: timedatectl set-ntp true 
+
+  - name: create andible user
+    user:
+      name: ansible
+      state: present        
+      shell: /bin/bash
+      groups: sudo
+      append: yes
+
+  - name: add sshkey to ansible user 
+    authorized_key:
+      user: ansible
+      state: present
+      manage_dir: true
+      key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+    
+  - name: Add sudo rights for ansible
+    copy:
+      dest: /etc/sudoers.d/ansible
+      content: "ansible ALL=(root) NOPASSWD: ALL"
+      backup: true

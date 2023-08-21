@@ -39,8 +39,23 @@
       enabled: yes
       masked: no
 
-  - name: adding existing user '{{ lookup('env','USER') }}' to group docker
+  - name: create docker user
     user:
-      name: "{{ lookup('env','USER') }}"
+      name: docker
+      state: present      
+      shell: /bin/bash
+      groups: sudo
+      append: yes
+
+  - name: add sshkey to docker user 
+    authorized_key:
+      user: docker
+      state: present
+      manage_dir: true
+      key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+      
+  - name: adding docker user to group docker
+    user:
+      name: docker
       groups: docker
       append: yes
