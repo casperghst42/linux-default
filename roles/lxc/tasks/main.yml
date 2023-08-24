@@ -1,0 +1,28 @@
+- name: install
+  apt:
+    state: present
+    pkg:
+      - lxc
+      - libvirt0
+      - libpam-cgfs
+      - bridge-utils 
+      - uidmap
+
+- name: default.conf exist
+  stat:
+    path: /etc/lxc/default.conf 
+  register: default_conf
+
+- name: default.conf
+  copy:
+    src: templates/default.conf.j2
+    dest: /etc/lxc/default.conf
+    backup: yes    
+      
+- name: lxc-net
+  copy:
+    src: templates/lxc-net.j2
+    dest: /etc/default/lxc-net
+    backup: yes    
+
+
