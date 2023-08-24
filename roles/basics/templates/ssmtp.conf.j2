@@ -1,0 +1,11 @@
+hostname={{ ssmtp_hostname }}
+root={{ ssmtp_root }}
+mailhub={{ ssmtp_mailhub }}
+RewriteDomain={{ ssmtp_rewritedomain }}
+FromLineOverride=Yes
+UseTLS=No
+UseSTARTTLS=Yes
+AuthUser={{ ssmtp_user }}
+AuthPass={{ ssmtp_password }}
+AuthMethod=LOGIN
+Debug=YES

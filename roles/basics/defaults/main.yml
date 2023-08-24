@@ -1,3 +1,8 @@
+ssmtp_hostname: nasnode1.c-note.dk
+ssmtp_root: cpedersen@fastmail.fm
+ssmtp_mailhub: mail.messagingengine.com:587
+ssmtp_rewritedomain: c-note.dk
+ssmtp_user: cpedersen@fastmail.fm
 ssmtp_password: !vault |
     $ANSIBLE_VAULT;1.1;AES256
     66383838643437326638343662323932313032363233366262383235303965356163386630363161
