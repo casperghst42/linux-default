@@ -17,8 +17,8 @@
         - fuse 
         - locales 
         - curl
+        - wget
         - systemd-timesyncd
-
 
   - name: default-editor
     command: 
@@ -29,6 +29,23 @@
       cmd: |
         echo "set mouse-=a" >> /etc/vim/vimrc
         echo "set ttymouse-=a" >> /etc/vimrc.tiny
+
+  - name: vimrc.local
+    shell:
+        cmd: |        
+            cat <<EOF | tee /etc/vim/vimrc.local > /dev/null
+
+            set tabstop     =4
+            set softtabstop =4
+            set shiftwidth  =4
+            set expandtab
+
+            autocmd BufNewFile,BufReadPost *.{yaml,yml} set filetype=yaml
+            autocmd FileType yaml setlocal ts=4 sts=4 sw=4 expandtab
+
+            set is hlsearch ai ic scs
+            nnoremap <esc><esc> :nohsl<cr>
+            EOF
 
   - name: be-root
     shell:
