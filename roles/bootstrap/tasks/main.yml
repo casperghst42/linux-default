@@ -24,28 +24,35 @@
     command: 
       cmd: update-alternatives --set editor /usr/bin/vim.basic
 
-  - name: disable mouse in vim
-    command:
+  - name: default editor vim
+    shell:
       cmd: |
-        echo "set mouse-=a" >> /etc/vim/vimrc
-        echo "set ttymouse-=a" >> /etc/vimrc.tiny
+        cat <<EOF | tee /etc/profile.d/editor
+        EDITOR=vim
+        EOF
+        chmod 644 /etc/profile.d/editor
 
   - name: vimrc.local
     shell:
-        cmd: |        
-            cat <<EOF | tee /etc/vim/vimrc.local > /dev/null
+      cmd: |        
+        cat <<EOF | tee /etc/vim/vimrc.local > /dev/null
 
-            set tabstop     =4
-            set softtabstop =4
-            set shiftwidth  =4
-            set expandtab
+        set tabstop     =4
+        set softtabstop =4
+        set shiftwidth  =4
+        set expandtab
 
-            autocmd BufNewFile,BufReadPost *.{yaml,yml} set filetype=yaml
-            autocmd FileType yaml setlocal ts=4 sts=4 sw=4 expandtab
+        autocmd BufNewFile,BufReadPost *.{yaml,yml} set filetype=yaml
+        autocmd FileType yaml setlocal ts=4 sts=4 sw=4 expandtab
 
-            set is hlsearch ai ic scs
-            nnoremap <esc><esc> :nohsl<cr>
-            EOF
+        set is hlsearch ai ic scs
+        nnoremap <esc><esc> :nohsl<cr>
+
+        set mouse-=a
+        set ttymouse-=a
+        EOF
+
+        chmod 644 /etc/vim/vimrc.local
 
   - name: be-root
     shell:
@@ -88,9 +95,14 @@
     shell:
       cmd: timedatectl set-timezone Europe/Copenhagen
 
+  - name: is timeserver set
+    shell: "egrep -c ^NTP /etc/systemd/timesyncd.conf"
+    ignore_errors: yes
+    register: timeserver
+
   - name: add local timeserver
-    shell:
-      cmd: echo "NTP=192.168.1.1" >> /etc/systemd/timesyncd.conf
+    shell: echo "NTP=192.168.1.1" >> /etc/systemd/timesyncd.conf
+    when: timeserver.stdout == "0"
 
   - name: restart systemd-timesyncd.service
     systemd:
