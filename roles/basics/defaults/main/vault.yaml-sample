@@ -1,0 +1,3 @@
+ssmtp_password: <smtp password>
+
+# Encrypt with: ansible-vault encrypt vault.yml
