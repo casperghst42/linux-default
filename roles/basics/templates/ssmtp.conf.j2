@@ -1,4 +1,4 @@
-hostname={{ ssmtp_hostname }}
+hostname={{ ansible_hostname }}.{{ ssmtp_rewritedomain }}
 root={{ ssmtp_root }}
 mailhub={{ ssmtp_mailhub }}
 RewriteDomain={{ ssmtp_rewritedomain }}
