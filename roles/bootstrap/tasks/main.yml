@@ -97,7 +97,7 @@
 
   - name: is timeserver set
     shell: "egrep -c ^NTP /etc/systemd/timesyncd.conf"
-    ignore_errors: yes
+    ignore_errors: true
     register: timeserver
 
   - name: add local timeserver
