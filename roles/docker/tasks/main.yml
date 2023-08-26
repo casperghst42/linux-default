@@ -1,8 +1,10 @@
 
   - name: Instal packages
-    apt: pkg={{item}} state=present install_recommends=false
-    with_items:
-    - bridge-utils
+    apt:
+      state: present
+      install_recommends: false
+      pkg:
+        - bridge-utils
 
   - name: get docker
     get_url: 
@@ -23,8 +25,9 @@
     
   - name: update docker.json
     copy:
-      content: '{ "ipv6":true, "fixed-cidr-v6":"{{ ipv6net }}"  }'
+      src: files/daemon.json
       dest: /etc/docker/daemon.json
+      backup: true
 
   - name: install docker-compose (legacy)
     get_url: 
@@ -59,3 +62,4 @@
       name: docker
       groups: docker
       append: yes
+  
