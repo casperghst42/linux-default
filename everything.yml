@@ -10,6 +10,7 @@
 
   vars:
     borgurl: https://github.com/borgbackup/borg/releases/download/1.2.4/borg-linux64
+    borg-version: 1.2.2
     ipv6net: "2a06:4004:90f2:3456::/80"
 
   roles:
