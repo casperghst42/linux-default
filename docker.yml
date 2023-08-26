@@ -9,6 +9,7 @@
 
   vars:
     ipv6net: "2a06:4004:90f2:4567::/80"
+    dnsserver: 192.168.1.1
 
   roles:
     - docker

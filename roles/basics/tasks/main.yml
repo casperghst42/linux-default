@@ -50,12 +50,10 @@
       enabled: yes
 
   - name: auto-upgrades
-    shell:
-      cmd: |
-        cat <<EOF | tee /etc/apt/apt.conf.d/20auto-upgrades > /dev/null
-        APT::Periodic::Update-Package-Lists "1";
-        APT::Periodic::Unattended-Upgrade "0";
-        EOF
+    copy:
+      src: files/20auto-upgrades
+      dest: /etc/apt/apt.conf.d/20auto-upgrades
+      backup: true
 
   - name: services unattended-upgrades
     systemd: 

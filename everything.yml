@@ -7,6 +7,7 @@
     borgurl: https://github.com/borgbackup/borg/releases/download/1.2.4/borg-linux64
     borgversion: 1.2.2
     ipv6net: "2a06:4004:90f2:3456::/80"
+    dnsserver: 192.168.1.1
  
   pre_tasks:
   - name: update APT cache
