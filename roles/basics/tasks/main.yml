@@ -1,0 +1,72 @@
+  - debug: var=ssmtp_user
+  - debug: var=ssmtp_password
+
+  - name: Instal packages
+    apt:
+      state: present
+      pkg:
+        - avahi-daemon
+        - ssmtp 
+        - logwatch 
+        - libacl1 
+        - build-essential 
+        - fuse 
+        - pkg-config 
+        - unattended-upgrades 
+        - apt-listchanges 
+        - ethtool          
+        - iptables 
+        - systemd-timesyncd
+        - jq
+
+  - name: ssmtp configuration
+    template:
+      src: templates/ssmtp.conf.j2
+      dest: /etc/ssmtp/ssmtp.conf
+      backup: true
+
+  - name: ssmtp revaliases
+    template:
+      src: templates/revaliases.j2
+      dest: /etc/ssmtp/revaliases
+      backup: yes
+
+  - name: ssh.servics
+    copy:
+      src: files/ssh.service
+      dest: /etc/avahi/services/ssh.service
+      backup: true
+
+  - name: sftp.service
+    copy:
+      src: files/sftp.service
+      dest:  /etc/avahi/services/sftp.service
+      backup: true
+
+  - name: services avahi-daemon
+    systemd:
+      name: avahi-daemon.service
+      state: started
+      enabled: yes
+
+  - name: auto-upgrades
+    shell:
+      cmd: |
+        cat <<EOF | tee /etc/apt/apt.conf.d/20auto-upgrades > /dev/null
+        APT::Periodic::Update-Package-Lists "1";
+        APT::Periodic::Unattended-Upgrade "0";
+        EOF
+
+  - name: services unattended-upgrades
+    systemd: 
+      name: unattended-upgrades.service
+      state: started
+      enabled: yes
+
+  - name: bookworm | sources.list and non-free-firmware
+    copy:
+      src: files/sources.list
+      dest: /etc/apt
+      backup: yes
+    when: ansible_distribution == 'Debian' and ansible_lsb.major_release|int >= 12
+
