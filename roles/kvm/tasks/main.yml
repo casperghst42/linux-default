@@ -22,24 +22,19 @@
       append: yes
 
   - name: sysctl netfilter
-    shell:
-      cmd: | 
-        cat << EOF | tee /etc/sysctl.d/99-netfilter-bridge.conf
-        net.bridge.bridge-nf-call-ip6tables = 0
-        net.bridge.bridge-nf-call-iptables = 0
-        net.bridge.bridge-nf-call-arptables = 0
-        EOF
+    copy:
+      src: files/99-netfilter-bridge.conf
+      dest: /etc/sysctl.d/99-netfilter-bridge.conf
+      backup: true
 
   - name: modules netfilter
-    shell:
-      cmd: |
-        cat << EOF | tee /etc/modules-load.d/br_netfilter.conf
-        br_netfilter
-        EOF
+    copy:
+      src: files/br_netfilter.conf
+      dest: /etc/modules-load.d/br_netfilter.conf
+      backup: true
 
   - name: aliases
-    shell:
-      cmd: |
-        cat << EOF | tee /etc/profile.d/virsh
-        alias virsh='sudo virsh'
-        EOF
+    copy:
+      src: files/virsh
+      dest: /etc/profile.d/virsh
+      backup: true
