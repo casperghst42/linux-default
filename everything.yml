@@ -1,17 +1,17 @@
 - hosts: all
+  remote_user: ansible
   become: yes
   gather_facts: yes
-  remote_user: ansible
-  
+
+  vars:
+    borgurl: https://github.com/borgbackup/borg/releases/download/1.2.4/borg-linux64
+    borgversion: 1.2.2
+    ipv6net: "2a06:4004:90f2:3456::/80"
+ 
   pre_tasks:
   - name: update APT cache
     apt: update_cache=yes cache_valid_time=28800
     when: ansible_os_family == 'Debian'
-
-  vars:
-    borgurl: https://github.com/borgbackup/borg/releases/download/1.2.4/borg-linux64
-    borg-version: 1.2.2
-    ipv6net: "2a06:4004:90f2:3456::/80"
 
   roles:
     - basics
