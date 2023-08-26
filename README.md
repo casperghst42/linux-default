@@ -1,5 +1,7 @@
 # Ansible setup 
 
+This is for my own use, there are quite curtain better ways to do this, but it works for me.
+
 To configure a server to my likings.
 
 1) setup vault and variables in roles/defaults (read the sample files)
