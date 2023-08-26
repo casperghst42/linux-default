@@ -1,6 +1,6 @@
 hostname={{ ansible_hostname }}.{{ ssmtp_rewritedomain }}
 root={{ ssmtp_root }}
-mailhub={{ ssmtp_mailhub }}
+mailhub={{ ssmtp_mailhub }}:{{ ssmtp_mailhub_port }}
 RewriteDomain={{ ssmtp_rewritedomain }}
 FromLineOverride=Yes
 UseTLS=No

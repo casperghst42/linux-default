@@ -1,4 +1,5 @@
 ssmtp_root: <who is sending the mail>
-ssmtp_mailhub: <mail server incl. port>
+ssmtp_mailhub: <mail server>
+ssmtp_mailhub_port: <mail server port>
 ssmtp_rewritedomain: <the domain>
 ssmtp_user: <login to mail user>
