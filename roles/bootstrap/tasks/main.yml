@@ -25,12 +25,12 @@
       cmd: update-alternatives --set editor /usr/bin/vim.basic
 
   - name: default editor vim
-    shell:
-      cmd: |
-        cat <<EOF | tee /etc/profile.d/editor
-        EDITOR=vim
-        EOF
-        chmod 644 /etc/profile.d/editor
+    copy:
+      dest: /etc/profile.d/editor
+      mode: 0644
+      backup: true
+      content: | 
+        EDITOR=vim        
 
   - name: vimrc.local
     shell:
