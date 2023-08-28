@@ -18,6 +18,7 @@
         - iptables 
         - systemd-timesyncd
         - jq
+        - ipmitool
 
   - name: ssmtp configuration
     template:
