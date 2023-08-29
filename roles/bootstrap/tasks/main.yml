@@ -26,17 +26,18 @@
 
   - name: default editor vim
     copy:
-      dest: /etc/profile.d/editor
+      dest: /etc/profile.d/editor.sh
       mode: 0644
       backup: true
       content: | 
         EDITOR=vim        
 
   - name: vimrc.local
-    shell:
-      cmd: |        
-        cat <<EOF | tee /etc/vim/vimrc.local > /dev/null
-
+    copy:
+      dest: /etc/vim/vimrc.local
+      backup: true
+      mode: 0644
+      content: |        
         set tabstop     =4
         set softtabstop =4
         set shiftwidth  =4
@@ -50,35 +51,31 @@
 
         set mouse-=a
         set ttymouse-=a
-        EOF
-
-        chmod 644 /etc/vim/vimrc.local
 
   - name: be-root
-    shell:
-      cmd: |
-        cat <<EOF | tee /usr/local/bin/be-root
+    copy:
+      dest: /usr/local/bin/be-root
+      backup: true
+      mode: 0755
+      content: |        
         #!/usr/bin/env bash
         sudo su - ${*}
-        EOF
-
-        chown root:root /usr/local/bin/be-root
-        chmod +x /usr/local/bin/be-root
 
   - name: environment
-    shell:
-      cmd: |
-        cat << EOF | tee -a /etc/environment
+    copy:
+      dest: /etc/environment
+      backup: true
+      content: |        
         LANG=en_US.utf-8
         LC_ALL=en_US.utf-8
-        EOF
+        
 
   - name: locale.gen
-    shell:
-      cmd: |
-        cat << EOF | tee -a /etc/locale.gen
-        en_US.UTF-8 UTF-8
-        EOF
+    lineinfile:
+      dest: /etc/locale.gen
+      backup: true
+      line: en_US.UTF-8 UTF-8
+      insertafter: EOF
 
   - name: generate locale
     shell:
@@ -101,7 +98,10 @@
     register: timeserver
 
   - name: add local timeserver
-    shell: echo "NTP=192.168.1.1" >> /etc/systemd/timesyncd.conf
+    lineinfile:
+      dest: /etc/systemd/timesyncd.conf
+      line: NTP=192.168.1.1
+      backup: true
     when: timeserver.stdout == "0"
 
   - name: restart systemd-timesyncd.service
@@ -130,6 +130,7 @@
     
   - name: Add sudo rights for ansible
     copy:
-      dest: /etc/sudoers.d/ansible
+      dest: /etc/sudoers.d/ansible      
       content: "ansible ALL=(root) NOPASSWD: ALL"
       backup: true
+      mode: 0644
