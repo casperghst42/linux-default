@@ -67,8 +67,7 @@
       backup: true
       content: |        
         LANG=en_US.utf-8
-        LC_ALL=en_US.utf-8
-        
+        LC_ALL=en_US.utf-8 
 
   - name: locale.gen
     lineinfile:
@@ -92,17 +91,13 @@
     shell:
       cmd: timedatectl set-timezone Europe/Copenhagen
 
-  - name: is timeserver set
-    shell: "egrep -c ^NTP /etc/systemd/timesyncd.conf"
-    ignore_errors: true
-    register: timeserver
-
   - name: add local timeserver
-    lineinfile:
+    lineinfile:      
       dest: /etc/systemd/timesyncd.conf
+      regexp: "^NTP="
       line: NTP=192.168.1.1
       backup: true
-    when: timeserver.stdout == "0"
+      state: present
 
   - name: restart systemd-timesyncd.service
     systemd:
