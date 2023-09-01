@@ -1,0 +1,83 @@
+  - name: add sshkey to user root
+    authorized_key:
+      user: root
+      state: present
+      manage_dir: true
+      key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+  - name: create user ansible
+    user:
+      name: ansible
+      state: present        
+      shell: /bin/bash
+      groups: sudo
+      append: yes
+
+  - name: Add sudo rights for ansible
+    copy:
+      dest: /etc/sudoers.d/ansible      
+      content: "ansible ALL=(root) NOPASSWD: ALL"
+      backup: true
+      mode: 0644
+
+  - name: add sshkey to user ansible
+    authorized_key:
+      user: ansible
+      state: present
+      manage_dir: true
+      key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+  - name: add user "{{ lookup('env' 'USER') }}" to pve
+    user:
+      name: "{{ lookup('env' 'USER') }}"
+      group: users
+      shell: /bin/bash      
+      state: present
+
+  - name: adding existing user "{{ lookup('env' 'USER') }}" to group sudo
+    user:
+      name: "{{ lookup('env' 'USER') }}"
+      groups: sudo
+      append: yes
+
+  - name: add sshkey to user "{{ lookup('env' 'USER') }}"
+    authorized_key:
+      user: "{{ lookup('env' 'USER') }}"
+      state: present
+      manage_dir: true
+      key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+
+  - name: add non-free-firmware to /etc/apt/sources.list
+    replace:
+      path: /etc/apt/sources.list      
+      regexp: '\s*(deb.+)(?<! non-free-firmware)$'
+      replace: '\1 non-free-firmware'
+      backup: true
+
+  - name: disable enterprise repo
+    lineinfile:
+      path: /etc/apt/sources.list.d/pve-enterprise.list
+      regexp: '^\s*(deb.*)'
+      replace: '# \1'
+
+  - name: disable ceph repo
+    lineinfile:
+      path: /etc/apt/sources.list.d/ceph.list
+      regexp: '^\s*(deb.*)'
+      replace: '# \1'
+
+  - name: add community repo
+    copy:
+      file: files/pve-community.list
+      dest: /etc/apt/sources.list.d
+
+  - name: update apt
+    apt:
+      update_cache: yes
+
+  - name: install intel-microcode
+    apt:
+      name: intel-microcode
+      state: present
+
+  
