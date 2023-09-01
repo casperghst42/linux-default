@@ -62,10 +62,17 @@
       state: started
       enabled: yes
 
-  - name: bookworm | sources.list and non-free-firmware
-    copy:
-      src: files/sources.list
-      dest: /etc/apt
-      backup: yes
+  - name: add non-free-firmware to /etc/apt/sources.list
+    replace:
+      path: /etc/apt/sources.list      
+      regexp: '\s*(deb.+)(?<! non-free-firmware)$'
+      replace: '\1 non-free-firmware'
+      backup: true
     when: ansible_distribution == 'Debian' and ansible_lsb.major_release|int >= 12
 
+  - name: add non-free to /etc/apt/sources.list
+    replace:
+      path: /etc/apt/sources.list      
+      regexp: '\s*(deb.+)(?<! non-free)$'
+      replace: '\1 non-free'
+      backup: true
