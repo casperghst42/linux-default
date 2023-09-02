@@ -62,17 +62,21 @@
       state: started
       enabled: yes
 
-  - name: add non-free-firmware to /etc/apt/sources.list
+  - name: Add contrib repository
     replace:
-      path: /etc/apt/sources.list      
-      regexp: '\s*(deb.+)(?<! non-free-firmware)$'
-      replace: '\1 non-free-firmware'
-      backup: true
-    when: ansible_distribution == 'Debian' and ansible_lsb.major_release|int >= 12
+      dest: /etc/apt/sources.list
+      regexp: '^(deb.+)(?<! contrib)$'
+      replace: '\1 contrib'
 
-  - name: add non-free to /etc/apt/sources.list
+  - name: Add contrib repository
     replace:
-      path: /etc/apt/sources.list      
-      regexp: '\s*(deb.+)(?<! non-free)$'
+      dest: /etc/apt/sources.list
+      regexp: '^(deb.+)(?<! non-free-firmware)$'
+      replace: '\1 non-free-firmware'
+
+  - name: Add contrib repository
+    replace:
+      dest: /etc/apt/sources.list
+      regexp: '^(deb.+)(?<! non-free)$'
       replace: '\1 non-free'
-      backup: true
+    when: ansible_distribution == 'Debian' and ansible_lsb.major_release|int >= 12
