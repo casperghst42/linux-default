@@ -27,63 +27,58 @@
       manage_dir: true
       key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
 
-  - name: add user "{{ lookup('env' 'USER') }}" to pve
-    user:
-      name: "{{ lookup('env' 'USER') }}"
-      group: users
-      shell: /bin/bash      
-      state: present
-
-  - name: adding existing user "{{ lookup('env' 'USER') }}" to group sudo
-    user:
-      name: "{{ lookup('env' 'USER') }}"
-      groups: sudo
-      append: yes
-
-  - name: add sshkey to user "{{ lookup('env' 'USER') }}"
-    authorized_key:
-      user: "{{ lookup('env' 'USER') }}"
-      state: present
-      manage_dir: true
-      key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
-
   - name: add non-free-firmware to /etc/apt/sources.list
     replace:
       path: /etc/apt/sources.list      
       regexp: '\s*(deb.+)(?<! non-free-firmware)$'
-      replace: '\1 non-free-firmware'
+      replace: '\1 non-free-firmware\n'
       backup: true
+
+  - name: is pve-enterprise
+    stat:
+      path: /etc/apt/sources.list.d/pve-enterprise.list
+    register: pve_enterprise
 
   - name: disable pve-enterprise repo
-    lineinfile:
+    replace:
       path: /etc/apt/sources.list.d/pve-enterprise.list
-      regexp: '^\s*(deb.*)'
-      replace: '# \1'
+      regexp: '^\s*(deb.*)' 
+      replace: '# \1\n'      
       backup: true
+    when: pve_enterprise.stat.exists
+
+  - name: is ceph
+    stat:
+      path: /etc/apt/sources.list.d/ceph.list
+    register: ceph
 
   - name: disable ceph repo
-    lineinfile:
+    replace:
       path: /etc/apt/sources.list.d/ceph.list
-      regexp: '^\s*(deb.*)'
-      replace: '# \1'
+      regexp: '^\s*(deb.*)' 
+      replace: '# \1\n'      
       backup: true
+    when: ceph.stat.exists
 
   - name: add community repo
-    copy:
-      path: /etc/apt/sources.list.d/pve-community.list
-      content: |
-        # PVE pve-no-subscription repository provided by proxmox.com,
-        # NOT recommended for production use
-        deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription
-      backup: true
-
-  - name: update apt
-    apt:
-      update_cache: yes
-
-  - name: install intel-microcode
-    apt:
-      name: intel-microcode
+    apt_repository:
+      repo: deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription
+      filename: pve-community
       state: present
+    notify: update apt cache
 
-  
+  - name: install packages
+    apt:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - intel-microcode
+      - vim
+
+  - name: disable proxmox subscription nagging
+    replace:
+      path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+      regexp: '^(.*)Ext\.Msg\.show\(\{(.*)$\n^(.*)No valid subscription(.*)$'
+      replace: '\1void({\2\n\3No valid subscription\4'
+      backup: true
+    notify: restart pveproxy

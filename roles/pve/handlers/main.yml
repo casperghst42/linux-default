@@ -1,0 +1,9 @@
+  - name: restart pveproxy
+    service:
+      name: pveproxy
+      state: restarted
+    listen: "restart pveproxy"
+
+  - name: update apt cache
+    apt:
+      update_cache: yes
