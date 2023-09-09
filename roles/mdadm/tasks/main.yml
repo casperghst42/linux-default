@@ -2,8 +2,8 @@
 
   - name: Instal packages
     apt:
-    state: present
-    install_recommends: failse
-    pkg:
-      - mdadm
-      - lvm2
+      state: present
+      install_recommends: false
+      pkg:
+        - mdadm
+        - lvm2

@@ -2,7 +2,7 @@
 
   - name: install borg
     get_url:
-      url: https://github.com/borgbackup/borg/releases/download/{{ borg-version }}/borg-linux64
+      url: "https://github.com/borgbackup/borg/releases/download/{{ borgversion }}/borg-linux64"
       dest: /usr/local/bin/borg-linux64
       mode: 755
 

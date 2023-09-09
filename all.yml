@@ -19,3 +19,4 @@
     - mdadm
     - docker
     - borg
+    - samba
