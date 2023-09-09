@@ -1,0 +1,19 @@
+- name: install
+  apt:
+    state: present
+    pkg:
+      - samba
+      - avahi-daemon
+
+- name: copy avahi service file
+  copy:
+    src: files/smb.service
+    dest: /etc/avahi/services/smb.service
+    mode: 0644
+
+- name: services avahi-daemon
+  systemd:
+    name: avahi-daemon.service
+    state: started
+    enabled: yes
+
