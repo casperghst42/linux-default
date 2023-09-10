@@ -1,46 +1,71 @@
 
-  - name: Instal packages
+  - name: instal packages
     apt:
       state: present
       install_recommends: false
       pkg:
         - bridge-utils
+        - ca-certificates
+        - curl
+        - gnupg
+      update_cache: true
 
-  - name: get docker
-    get_url: 
-      url: https://get.docker.com 
-      dest: /tmp/get-docker.sh 
-      mode: 755
+  - name: get architecture
+    shell: dpkg --print-architecture
+    register: deb_architecture
 
-  - name: install docker
-    shell:
-      cmd: |
-        apt update
-        sh /tmp/get-docker.sh
+  - name: convert ASCII armored GPG key to binary key
+    shell: |
+      curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
-  - name: install composer plugin
-    apt:
-      name: docker-compose-plugin
+  - name: add docker apt repository key.
+    get_url:
+      url: https://download.docker.com/linux/debian/gpg
+      dest: /etc/apt/trusted.gpg.d/docker.asc
+      mode: 0644
+      force: true
+    tags: install_docker
+
+  - name: Add docker apt repository.
+    apt_repository:
+      repo: "deb [arch={{ deb_architecture.stdout }} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
       state: present
+      update_cache: yes
+      filename: docker
+    tags: install_docker
+
+  - name: Install Docker and related components
+    apt:
+      name:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+      state: latest
+      update_cache: true
+    tags: install_docker
     
   - name: update docker.json
     template:
       src: templates/daemon.json.j2
       dest: /etc/docker/daemon.json
       backup: true
+    tags: install_docker
+
+  - name: restart Docker 
+    systemd:
+      name: docker
+      state: restarted 
+      masked: no
+    tags: install_docker
 
   - name: install docker-compose (legacy)
     get_url: 
       url: https://raw.githubusercontent.com/linuxserver/docker-docker-compose/master/run.sh
       dest: /usr/local/bin/docker-compose
       mode: 755
-
-  - name: restart docker
-    systemd:
-      name: docker.service
-      state: reloaded      
-      enabled: yes
-      masked: no
+    tags: install_docker
 
   - name: create docker user
     user:
@@ -49,6 +74,7 @@
       shell: /bin/bash
       groups: sudo
       append: yes
+    tags: install_docker
 
   - name: add sshkey to docker user 
     authorized_key:
@@ -56,10 +82,11 @@
       state: present
       manage_dir: true
       key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+    tags: install_docker
       
   - name: adding docker user to group docker
     user:
       name: docker
       groups: docker
       append: yes
-  
+    tags: install_docker
