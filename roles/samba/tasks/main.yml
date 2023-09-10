@@ -4,6 +4,7 @@
     pkg:
       - samba
       - avahi-daemon
+    update_cache: true              
 
 - name: copy avahi service file
   copy:

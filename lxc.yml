@@ -4,10 +4,5 @@
   become: yes
   remote_user: ansible
 
-  pre_tasks:
-  - name: update APT cache
-    apt: update_cache=yes cache_valid_time=28800
-    when: ansible_os_family == 'Debian'
-
   roles:
     - lxc

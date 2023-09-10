@@ -3,7 +3,7 @@
   - name: Instal packages
     apt:
       state: present
-      install_recommends: false
       pkg:
         - mdadm
         - lvm2
+      update_cache: true                

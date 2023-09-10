@@ -7,7 +7,8 @@
       - libpam-cgfs
       - bridge-utils 
       - uidmap
-
+    update_cache: true        
+    
 - name: default.conf
   copy:
     src: files/default.conf

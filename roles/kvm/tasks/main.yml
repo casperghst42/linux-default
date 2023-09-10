@@ -1,13 +1,17 @@
   # code=ansible
 
   - name: Instal packages
-    apt: pkg={{item}} state=present install_recommends=false
+    apt: 
+        pkg={{item}} 
+        state=present 
+        install_recommends=true
     with_items:
     - libvirt-daemon-system
     - qemu-kvm
     - bridge-utils
     - libvirt-clients
     - virt-manager
+    update_cache: true            
 
   - name: adding existing user '{{ lookup('env','USER') }}' to group libvirt
     user:

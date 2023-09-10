@@ -19,6 +19,7 @@
         - systemd-timesyncd
         - jq
         - ipmitool
+    update_cache: true        
 
   - name: ssmtp configuration
     template:

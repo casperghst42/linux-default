@@ -19,6 +19,7 @@
         - curl
         - wget
         - systemd-timesyncd
+    update_cache: true        
 
   - name: default-editor
     command: 
