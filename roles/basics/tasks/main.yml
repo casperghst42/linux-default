@@ -1,8 +1,9 @@
   - debug: var=ssmtp_user
   - debug: var=ssmtp_password
 
-  - name: Instal packages
+  - name: instal packages
     apt:
+      update_cache: true 
       state: present
       pkg:
         - avahi-daemon
@@ -19,7 +20,7 @@
         - systemd-timesyncd
         - jq
         - ipmitool
-    update_cache: true        
+       
 
   - name: ssmtp configuration
     template:
