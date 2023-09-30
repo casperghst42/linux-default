@@ -9,10 +9,12 @@
         - curl
         - gnupg
       update_cache: true
+    tags: install_docker
 
   - name: get architecture
     shell: dpkg --print-architecture
     register: deb_architecture
+    tags: install_docker
 
   - name: get gpg key
     get_url:
