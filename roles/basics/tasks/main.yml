@@ -20,6 +20,8 @@
         - systemd-timesyncd
         - jq
         - ipmitool
+        - net-tools
+        - rsync
        
 
   - name: ssmtp configuration
@@ -68,12 +70,14 @@
     replace:
       dest: /etc/apt/sources.list
       regexp: '^(deb(?!.* contrib).*)'
+      backup: true
 
   - name: Add non-free-firmware repository
     replace:
       dest: /etc/apt/sources.list      
       regexp: '^(deb(?!.* non-free-firmware).*)'
       replace: '\1 non-free-firmware'
+      backup: true
     when: ansible_distribution == 'Debian' and ansible_lsb.major_release|int >= 12
 
   - name: Add non-free repository
@@ -81,3 +85,4 @@
       dest: /etc/apt/sources.list
       regexp: '^(deb(?!.* non-free).*)'
       replace: '\1 non-free'
+      backup: true
